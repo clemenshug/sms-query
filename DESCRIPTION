@@ -1,0 +1,53 @@
+Package: sms.query
+Title: Query the Small Molecule Suite
+Version: 0.1.0
+Authors@R: c(
+  person(
+    given = "Clemens",
+    family = "Hug",
+    role = c("aut", "cre"),
+    email = "clemens_hug@hms.harvard.edu",
+    comment = c(ORCID = "0000-0002-8299-3274")
+  ),
+  person(
+    given = "Nienke",
+    family = "Moret",
+    role = c("aut"),
+    email = "nienke_moret@hms.harvard.edu",
+    comment = c(ORCID = "0000-0001-6038-6863")
+  )
+  )
+Description: The Small Molecule Suite (SMS) app is a free, open-acces Shiny app.
+  The goal of the SMS is to help scientists understand and work with
+  the targets of molecular probes, approved drugs and other drug-like molecules,
+  while acknowliging the complexity of polypharmacology.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports:
+  htmltools,
+  data.table,
+  dplyr,
+  DT,
+  fst,
+  glue,
+  here,
+  magrittr,
+  markdown,
+  morgancpp,
+  purrr,
+  readr,
+  rlang,
+  shinycssloaders,
+  stringr,
+  writexl,
+  yonder,
+  jsonlite,
+  shiny,
+  forcats,
+  stats,
+  utils,
+  R.utils,
+  shinyjs
