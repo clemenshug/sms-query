@@ -16,14 +16,7 @@ library(DT)
 library(shinycssloaders)
 library(writexl)
 library(shinyjs)
-# library(future)
 
-# plan(multicore)
-
-# source("awspass.config")
-
-source("utils/utils.R", local = TRUE)
-source("utils/constants.R", local = TRUE)
 source("utils/similarity_funs.R", local = TRUE)
 
 # Components used in multiple apps

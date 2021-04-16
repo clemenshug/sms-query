@@ -6,7 +6,7 @@
 #' @param file_prefix Character, function or reactive to generate the filename prefix
 mod_server_download_button <- function(
   input, output, session,
-  r_data, type = c("csv", "excel"), file_prefix = function() paste0("dl-", Sys.Date())
+  r_data, type = c("csv", "excel"), file_prefix = function() paste0("dl-", date())
 ) {
   output$download <- downloadHandler(
     filename = function()

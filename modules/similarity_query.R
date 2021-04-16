@@ -77,7 +77,9 @@ similarityQueryUI <- function(id) {
     columns(
       column(
         card(
-          DT::DTOutput(outputId = ns("table"))
+          DT::DTOutput(outputId = ns("table")),
+          mod_ui_download_button(ns("table_csv_dl"), "Download CSV"),
+          mod_ui_download_button(ns("table_xlsx_dl"), "Download Excel")
         )
       )
     )
@@ -181,7 +183,12 @@ similarityQueryServer <- function(input, output, session) {
 
   r_result_dt <- reactive({
     DT::datatable(
-      r_results()
+      r_results(),
+      style = "bootstrap4",
+      selection = "none",
+      options = list(
+        scrollX = TRUE
+      )
     )
   })
 
@@ -193,7 +200,7 @@ similarityQueryServer <- function(input, output, session) {
   #   table_inputs("table_sim_compound")
   # )
 
-  # callModule(mod_server_download_button, "output_table_xlsx_dl", r_tbl_sim_data, "excel", r_download_name)
-  # callModule(mod_server_download_button, "output_table_csv_dl", r_tbl_sim_data, "csv", r_download_name)
+  callModule(mod_server_download_button, "table_xlsx_dl", r_results, "excel")
+  callModule(mod_server_download_button, "table_csv_dl", r_results, "csv")
 
 }
