@@ -15,7 +15,8 @@ tas_weighted_jaccard <- function(query_ids, target_ids = NULL, min_n = 6) {
   target_tas[
     query_tas,
     on = .(lspci_target_id),
-    nomatch = NULL
+    nomatch = NULL,
+    allow.cartesian = TRUE
   ][
     ,
     mask := tas < 10 | i.tas < 10
