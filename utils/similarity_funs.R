@@ -42,9 +42,13 @@ chemical_similarity <- function(query_ids, target_ids = NULL) {
   query_ids %>%
     set_names() %>%
     map(
-      data_fingerprints$tanimoto_all
+      ~data_fingerprints$tanimoto_all(.x) %>%
+        setDT() %>% {
+          .[
+            if (is.null(target_ids)) TRUE else id %in% target_ids
+          ]
+        }
     ) %>%
-    map(setDT) %>%
     rbindlist(idcol = "query_lspci_id") %>% {
       .[
         ,
@@ -53,8 +57,6 @@ chemical_similarity <- function(query_ids, target_ids = NULL) {
           target_lspci_id = id,
           structural_similarity
         )
-      ][
-        if (is.null(target_ids)) TRUE else target_lspci_id %in% target_ids
       ]
     } %>%
     merge_compound_names()
