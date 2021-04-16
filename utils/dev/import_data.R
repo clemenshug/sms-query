@@ -18,11 +18,14 @@ syn <- synDownloader(dir_data, ifcollision = "overwrite.local")
 
 syn_tables <- synPluck(syn_parent, release, "website_tables")
 
-files <- synChildren(syn_tables) %>% {
-  .[
-    !str_ends(names(.), ".qs") &
-      !str_detect(names(.), "shiny_inchis")
-  ]
-}
+files <- synChildren(syn_tables)[
+  c(
+    "shiny_compounds.fst",
+    "shiny_compound_names.fst",
+    "shiny_tas.fst",
+    "shiny_pfp.fst",
+    "shiny_fingerprints.bin"
+  )
+]
 
 syn(files)
