@@ -9,6 +9,14 @@ all_similarities_table <- function(
   ]
 }
 
+split_compounds <- function(x) {
+  x %>%
+    str_trim() %>%
+    str_split("[\\n;]+") %>%
+    chuck(1L) %>%
+    magrittr::extract(. != "")
+}
+
 similarityQueryUI <- function(id) {
   ns <- NS(id)
   tagList(
@@ -30,8 +38,8 @@ similarityQueryUI <- function(id) {
               rows = 10,
               placeholder = "tofacitinib,ruxolitinib,..."
             ),
-            p("Enter one compound per line or separate them using spaces, commas,",
-              "or semicolons.", class = "text-muted"),
+            p("Enter one compound per line or separate them using semicolons.",
+              class = "text-muted"),
             uiOutput(
               outputId = ns("feedback_query_compounds")
             )
@@ -109,11 +117,7 @@ similarityQueryServer <- function(input, output, session) {
 
   r_query_compounds_original <- reactive({
     req(r_query_compounds_raw())
-    r_query_compounds_raw() %>%
-      str_trim() %>%
-      str_split("[\\s,;]+") %>%
-      chuck(1L) %>%
-      magrittr::extract(. != "")
+    split_compounds(r_query_compounds_raw())
   })
 
   r_query_compounds <- reactive({
@@ -129,11 +133,7 @@ similarityQueryServer <- function(input, output, session) {
 
   r_target_compounds_original <- reactive({
     req(r_target_compounds_raw())
-    r_target_compounds_raw() %>%
-      str_trim() %>%
-      str_split("[\\s,;]+") %>%
-      chuck(1L) %>%
-      magrittr::extract(. != "")
+    split_compounds(r_target_compounds_raw())
   })
 
   r_target_compounds <- reactive({
