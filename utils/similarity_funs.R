@@ -1,4 +1,4 @@
-tas_weighted_jaccard <- function(query_ids, target_ids = NULL, min_n = 6) {
+tas_weighted_jaccard <- function(query_ids, target_ids = NULL, min_n = 4) {
   query_ids <- convert_compound_ids(query_ids)
   target_ids <- convert_compound_ids(target_ids)
 
@@ -18,6 +18,8 @@ tas_weighted_jaccard <- function(query_ids, target_ids = NULL, min_n = 6) {
     nomatch = NULL,
     allow.cartesian = TRUE
   ][
+    query_lspci_id != target_lspci_id
+  ][
     ,
     mask := tas < 10 | i.tas < 10
   ][
@@ -32,8 +34,7 @@ tas_weighted_jaccard <- function(query_ids, target_ids = NULL, min_n = 6) {
       n_prior_tas = integer()
     ),
     by = .(query_lspci_id, target_lspci_id)
-  ] %>%
-    merge_compound_names()
+  ]
 }
 
 chemical_similarity <- function(query_ids, target_ids = NULL) {
@@ -58,12 +59,13 @@ chemical_similarity <- function(query_ids, target_ids = NULL) {
           target_lspci_id = id,
           structural_similarity
         )
+      ][
+        query_lspci_id != target_lspci_id
       ]
-    } %>%
-    merge_compound_names()
+    }
 }
 
-phenotypic_similarity <- function(query_ids, target_ids = NULL, min_n = 6) {
+phenotypic_similarity <- function(query_ids, target_ids = NULL, min_n = 4) {
   query_ids <- convert_compound_ids(query_ids)
   target_ids <- convert_compound_ids(target_ids)
 
@@ -83,6 +85,8 @@ phenotypic_similarity <- function(query_ids, target_ids = NULL, min_n = 6) {
     all = FALSE,
     suffixes = c("_1", "_2")
   )[
+    lspci_id_1 != lspci_id_2
+  ][
     ,
     mask := abs(rscore_tr_1) >= 2.5 | abs(rscore_tr_2) >= 2.5
   ][

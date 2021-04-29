@@ -1,7 +1,7 @@
 all_similarities_table <- function(
   query_ids, target_ids = NULL,
-  tas_n_common = 6L,
-  pfp_n_common = 6L
+  tas_n_common = 4L,
+  pfp_n_common = 4L
 ) {
   similarity_cols <- c(
     "tas_similarity", "structural_similarity", "phenotypic_correlation"
@@ -9,7 +9,7 @@ all_similarities_table <- function(
   similarities <- merge(
     tas_weighted_jaccard(query_ids, target_ids, min_n = tas_n_common),
     chemical_similarity(query_ids, target_ids),
-    by = c("target_lspci_id", "query_lspci_id", "query_compound", "target_compound"),
+    by = c("target_lspci_id", "query_lspci_id"),
     all = TRUE
   ) %>%
     merge(
@@ -21,7 +21,11 @@ all_similarities_table <- function(
         ,
         (similarity_cols) := lapply(.SD, signif, digits = 3), .SDcols = similarity_cols
       ]
-    }
+    } %>%
+    merge_compound_names() %>%
+    relocate(
+      query_compound, target_compound, all_of(similarity_cols)
+    )
   # for (j in similarity_cols)
   #   set(similarities, j = j, value = signif(similarities[[j]], digits = 2))
   similarities
