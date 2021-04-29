@@ -24,12 +24,12 @@ tas_weighted_jaccard <- function(query_ids, target_ids = NULL, min_n = 6) {
     ,
     if (sum(mask) >= min_n) .(
       "tas_similarity" = sum(pmin(tas[mask], i.tas[mask])) / sum(pmax(tas[mask], i.tas[mask])),
-      "n" = sum(mask),
-      "n_prior" = .N
+      "n_tas" = sum(mask),
+      "n_prior_tas" = .N
     ) else .(
       tas_similarity = double(),
-      n = integer(),
-      n_prior = integer()
+      n_tas = integer(),
+      n_prior_tas = integer()
     ),
     by = .(query_lspci_id, target_lspci_id)
   ] %>%
@@ -61,6 +61,47 @@ chemical_similarity <- function(query_ids, target_ids = NULL) {
       ]
     } %>%
     merge_compound_names()
+}
+
+phenotypic_similarity <- function(query_ids, target_ids = NULL, min_n = 6) {
+  query_ids <- convert_compound_ids(query_ids)
+  target_ids <- convert_compound_ids(target_ids)
+
+  query_pfps <- data_pfp[
+    lspci_id %in% query_ids
+  ] %>%
+    unique()
+  target_pfps <- data_pfp[
+    if (is.null(target_ids)) TRUE else lspci_id %in% target_ids
+  ] %>%
+    unique()
+
+  merge(
+    query_pfps,
+    target_pfps,
+    by = "assay_id",
+    all = FALSE,
+    suffixes = c("_1", "_2")
+  )[
+    ,
+    mask := abs(rscore_tr_1) >= 2.5 | abs(rscore_tr_2) >= 2.5
+  ][
+    ,
+    if(sum(mask) >= min_n) .(
+      "phenotypic_correlation" = cor(rscore_tr_1, rscore_tr_2),
+      "n_pfp" = sum(mask),
+      "n_prior_pfp" = .N
+    ) else .(
+      phenotypic_correlation = double(),
+      n_pfp = integer(),
+      n_prior_pfp = integer()
+    ),
+    by = .(lspci_id_1, lspci_id_2)
+  ] %>%
+    setnames(
+      c("lspci_id_1", "lspci_id_2"),
+      c("query_lspci_id", "target_lspci_id")
+    )
 }
 
 find_compound_ids <- function(compound_names) {

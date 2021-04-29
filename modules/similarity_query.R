@@ -3,10 +3,28 @@ all_similarities_table <- function(
   tas_n_common = 6L,
   pfp_n_common = 6L
 ) {
-  tas_weighted_jaccard(query_ids, target_ids, min_n = tas_n_common)[
+  similarity_cols <- c(
+    "tas_similarity", "structural_similarity", "phenotypic_correlation"
+  )
+  similarities <- merge(
+    tas_weighted_jaccard(query_ids, target_ids, min_n = tas_n_common),
     chemical_similarity(query_ids, target_ids),
-    on = .(target_lspci_id, query_lspci_id, query_compound, target_compound)
-  ]
+    by = c("target_lspci_id", "query_lspci_id", "query_compound", "target_compound"),
+    all = TRUE
+  ) %>%
+    merge(
+      phenotypic_similarity(query_ids, target_ids, min_n = pfp_n_common),
+      all = TRUE,
+      by = c("target_lspci_id", "query_lspci_id")
+    ) %>% {
+      .[
+        ,
+        (similarity_cols) := lapply(.SD, signif, digits = 3), .SDcols = similarity_cols
+      ]
+    }
+  # for (j in similarity_cols)
+  #   set(similarities, j = j, value = signif(similarities[[j]], digits = 2))
+  similarities
 }
 
 split_compounds <- function(x) {
@@ -36,7 +54,7 @@ similarityQueryUI <- function(id) {
               label = NULL,
               width = "100%",
               rows = 10,
-              placeholder = "tofacitinib,ruxolitinib,..."
+              placeholder = "tofacitinib;ruxolitinib;..."
             ),
             p("Enter one compound per line or separate them using semicolons.",
               class = "text-muted"),
@@ -61,7 +79,7 @@ similarityQueryUI <- function(id) {
               label = NULL,
               width = "100%",
               rows = 10,
-              placeholder = "tofacitinib,ruxolitinib,..."
+              placeholder = "tofacitinib;ruxolitinib;..."
             ),
             uiOutput(
               outputId = ns("feedback_target_compounds")
